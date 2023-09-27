@@ -1,2 +1,18 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+	import Loom from "../lib/components/Loom.svelte";
+
+</script>
+<Loom />
+
+<style>
+    :global(*) {
+        margin: 0;
+        box-sizing: border-box;
+        user-select: none;
+    }
+
+    :global(body) {
+        background-color: #112233;
+        overflow: hidden;
+    }
+</style>
