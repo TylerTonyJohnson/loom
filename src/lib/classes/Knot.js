@@ -1,47 +1,85 @@
-import { checkType } from '../helpers';
-import ThreadType from '$lib/enums.js';
+import { checkType, getRandomWord, randomInt } from '../helpers';
+import { ThreadType } from '$lib/enums.js';
+import { FlowType } from '../enums';
+import Loop from './Loop';
+import { writable } from 'svelte/store';
 
 export default class Knot {
-	constructor() {
-		this.position = { x: 0, y: 0 };
-		this.name = 'Dolby Surround';
+	constructor(position) {
+		this.position = writable({ x: 0, y: 0 });
+
+		this.inLoops = [];
+		this.outLoops = [];
 
 		// Setup
-		this.tie('strange');
+		this.setName();
+		this.setLoops();
+		this.setWeavePattern();
+
+		// this.position.subscribe((value) => {
+		// 	this.$position = value;
+		// });
+	}
+
+	updatePosition(position) {
+		this.position.update((oldPosition) => {
+			return { x: oldPosition.x + position.x, y: oldPosition.y + position.y };
+		});
+	}
+
+	setName() {
+		this.name = getRandomWord();
+		this.emblemName = 'd';
+	}
+
+	setLoops() {
+		const inputCount = randomInt(0, 4);
+		const outputCount = randomInt(0, 4);
+
+		for (let i = 0; i < inputCount; i++) {
+			this.addLoop(getRandomWord(), ThreadType.String, FlowType.Input);
+		}
+
+		for (let i = 0; i < outputCount; i++) {
+			this.addLoop(getRandomWord(), ThreadType.String, FlowType.Output);
+		}
+	}
+
+	setWeavePattern() {
+		this.weavePattern = () => {
+			console.log('weaving');
+		};
 	}
 
 	/* 
         Methods
     */
 
-	tie(value) {
-		this.type = checkType(value);
-		if (!this.type) {
-			console.log('no known content type');
-			return;
-		}
+	weave() {
+		this.updateInputs();
+		this.weavePattern();
+	}
 
-		switch (this.type) {
-			case ThreadType.Boolean:
-				console.log('boolean');
+	addLoop(name, type, flowType) {
+		const newLoop = new Loop(this, name, type, flowType);
+
+		switch (flowType) {
+			case FlowType.Input:
+				this.inLoops.push(newLoop);
 				break;
-			case ThreadType.Number:
-				console.log('number');
-				break;
-			case ThreadType.String:
-				console.log('string');
-				break;
-			case ThreadType.Array:
-				console.log('array');
-				break;
-			case ThreadType.Object:
-				console.log('object');
-				break;
-			case ThreadType.Function:
-				console.log('function');
+			case FlowType.Output:
+				this.outLoops.push(newLoop);
 				break;
 		}
+	}
 
-		this.contents = value;
+	/* 
+		Utilities
+	*/
+
+	updateInputs() {
+		this.inLoops.forEach((loop) => {
+			loop.sync();
+		});
 	}
 }

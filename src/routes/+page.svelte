@@ -14,5 +14,6 @@
     :global(body) {
         background-color: #112233;
         overflow: hidden;
+        font-family: Open Sans, sans-serif;
     }
 </style>

@@ -1,20 +1,24 @@
 <script>
+	import Loop from './Loop.svelte';
+
+	export let position;
 	export let knot;
 	export let offset;
 	export let zoom;
 	let isMoving = false;
-	let position = { x: 0, y: 0 };
-
-	// Functions
+	/* 
+		Events
+	*/
 	function handleMouseMove(event) {
 		if (!isMoving) return;
-		position = { x: position.x + event.movementX, y: position.y + event.movementY };
+		knot.updatePosition({x: event.movementX, y: event.movementY});
 	}
 
 	function handleMouseDown(event) {
 		switch (event.which) {
 			case 1:
 				isMoving = true;
+				event.target.focus();
 				break;
 			case 2:
 				break;
@@ -39,17 +43,23 @@
 		isMoving = false;
 	}
 
-    function handleSubmit() {
-        console.log("submit")
-    }
+	function handleSubmit() {
+		console.log('submit');
+	}
+
+	function handleWeave() {
+		knot.weave();
+		knot = knot;	// Not sure if this is the best way to do this
+	}
 </script>
 
 <div
 	class="knot"
+	tabindex="0"
 	style="
     scale: {zoom};
-    left: {position.x}px;
-    top: {position.y}px;
+    left: {$position.x}px;
+    top: {$position.y}px;
     translate: {offset.x}px {offset.y}px;
     "
 >
@@ -57,20 +67,28 @@
 	<div class="name" class:grabbing={isMoving} on:mousedown={handleMouseDown}>
 		{knot.name}
 	</div>
-	<!-- Contents -->
-	{#each knot.contents as contentItem}
-		<div class="contents-container">
-			<input
-				class="contents"
-				contenteditable="true"
-				bind:value={contentItem}
-                on:focus={(event)=> {event.target.select();}}
-                on:input={handleSubmit}
-				class:string-type={typeof contentItem === 'string'}
-				class:number-type={typeof contentItem === 'number'}
-			/>
+
+	<!-- Loops -->
+	<div class="loop-container">
+		<!-- Inputs -->
+		<div class="input-container">
+			{#each knot.inLoops as loop}
+				<Loop {loop} editable={!loop.binding && knot.outLoops.length > 0} knotPosition={knot.position} {offset} />
+			{/each}
 		</div>
-	{/each}
+		<span class="material-symbols-outlined emblem-container">{knot.emblemName}</span>
+		<!-- Outputs -->
+		<div class="output-container">
+			{#each knot.outLoops as loop}
+				<Loop {loop} editable={knot.inLoops.length === 0} knotPosition={knot.position} {offset} />
+			{/each}
+		</div>
+	</div>
+
+	<!-- Bottom bumper -->
+	<div class="bumper" on:click={handleWeave}>
+		<span class="material-symbols-outlined bumper-icon"> expand_more </span>
+	</div>
 </div>
 
 <svelte:window
@@ -82,44 +100,86 @@
 <style>
 	.knot {
 		position: absolute;
-		/* padding: 1em; */
-		background-color: darkslategray;
-		opacity: 0.9;
+		display: flex;
+		flex-direction: column;
+		min-width: 8rem;
+		max-width: 16rem;
 		translate: -50% -50%;
 		transition-property: scale;
 		transition-timing-function: ease-out;
 		transition-duration: 0.1s;
-		border: solid white 2px;
+		/* border: solid white 2px; */
 		border-radius: 1rem;
 		overflow: hidden;
+		background-color: rgba(221, 160, 221, 0.05);
+		backdrop-filter: blur(3px) grayscale(50%);
+		box-shadow: rgb(247, 168, 247) inset 2px 2px 8px, 
+			rgb(74, 49, 74) inset -2px -2px 8px,
+			rgba(0, 0, 0, 0.5) 4px 4px 8px;
+	}
+
+	.knot:focus-within {
+		/* border-color: orange;
+		border-width: 3px; */
+		outline: orange 3px solid;
 	}
 
 	.name {
-		background-color: green;
-		padding: 0.5rem;
+		min-height: 1rem;
+		background-color: rgba(0, 128, 0, 0.8);
+		padding: 0.3rem;
+
 		color: white;
+		font-size: 1.5rem;
 		text-align: center;
 		cursor: grab;
+		border-radius: 1rem 1rem 0 0 ;
 	}
 	.name.grabbing {
 		cursor: grabbing;
 	}
 
-	.contents-container {
-		background-color: orange;
-		padding: 1em;
+	.shadow {
+		box-shadow: rgba(255, 255, 255, 0.5) inset 2px 2px 4px, 
+			rgba(0, 0, 0, 0.5) inset -2px -2px 4px;
 	}
 
-	.contents {
-		background-color: white;
-		text-align: center;
+	.loop-container {
+		display: grid;
+		grid-template-columns: auto auto auto;
+		justify-content: space-between;
+		padding: 0.25rem;
+		/* background-color: red; */
 	}
 
-	.string-type {
-		color: maroon;
+	.input-container,
+	.output-container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 
-	.number-type {
-		color: green;
+	.emblem-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		/* background-color: red; */
+		color: white;
+		width: 2rem;
+	}
+
+	.bumper {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 1rem;
+		background-color: rgba(0, 128, 0, 0.8);
+		border-radius: 0 0 1rem 1rem;
+	}
+
+	.bumper-icon {
+		color: white;
+		font-size: 0.75rem;
 	}
 </style>
