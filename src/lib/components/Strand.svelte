@@ -51,7 +51,7 @@
 <style>
 	.strand {
 		position: absolute;
-		border: lightcyan 2px solid;
+		/* border: lightcyan 2px solid; */
 		pointer-events: none;
         z-index: 2;
 	}

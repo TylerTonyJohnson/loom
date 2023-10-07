@@ -1,7 +1,9 @@
 <script>
-	import Loom from "../lib/components/Loom.svelte";
+	// import Loom from "../lib/components/Loom.svelte";
+	import Loom from "../lib/components2/Loom.svelte";
 
 </script>
+<!-- <Loom /> -->
 <Loom />
 
 <style>

@@ -82,10 +82,10 @@
 	.input .eyelet {
 		order: 1;
 	}
-	.input .value {
+	.input .value  {
 		order: 2;
 	}
-	.input .name {
+	.input .name  {
 		order: 3;
 	}
 

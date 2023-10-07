@@ -1,36 +1,61 @@
 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_4_35)">
-<rect width="40" height="40" fill="#334455"/>
-<rect x="0.25" y="0.25" width="39.5" height="39.5" stroke="#CCCCBB" stroke-opacity="0.5" stroke-width="0.5"/>
-<rect x="0.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="0.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="0.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="0.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="0.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="8.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="8.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="8.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="8.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="8.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="16.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="16.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="16.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="16.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="16.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="24.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="24.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="24.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="24.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="24.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="32.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="32.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="32.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="32.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-<rect x="32.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15" stroke-width="0.25"/>
-</g>
-<defs>
-<clipPath id="clip0_4_35">
-<rect width="40" height="40" fill="white"/>
-</clipPath>
-</defs>
+    <g clip-path="url(#clip0_4_35)">
+        <rect width="40" height="40" fill="#334455" />
+        <rect x="0.25" y="0.25" width="39.5" height="39.5" stroke="#CCCCBB" stroke-opacity="0.5" stroke-width="0.5" />
+        <rect x="0.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="0.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="0.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="0.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="0.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="8.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="8.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="8.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="8.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="8.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="16.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="16.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="16.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="16.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="16.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="24.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="24.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="24.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="24.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="24.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="32.125" y="0.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="32.125" y="8.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="32.125" y="16.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="32.125" y="24.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+        <rect x="32.125" y="32.125" width="7.75" height="7.75" stroke="#CCCCBB" stroke-opacity="0.15"
+            stroke-width="0.25" />
+    </g>
+    <defs>
+        <clipPath id="clip0_4_35">
+            <rect width="40" height="40" fill="white" />
+        </clipPath>
+    </defs>
 </svg>
