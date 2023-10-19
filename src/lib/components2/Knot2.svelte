@@ -19,6 +19,12 @@
 	let isFocused = false;
 	let isMoving = false;
 
+	let inLoopComponents = [];
+	let outLoopComponents = [];
+
+	// $: console.log(inLoopComponents, outLoopComponents)
+	$: console.log(outLoopComponents[0]?.toast)
+
 	// Snapping
 	const snapDistance = 20;
 
@@ -139,13 +145,13 @@
 	<div id="header">{name}</div>
 	<div id="body">
 		<div class="in-loops">
-			{#each inLoops as loop}
-				<Loop {...loop} />
+			{#each inLoops as loop, i}
+				<Loop {...loop} bind:this={inLoopComponents[i]} self={inLoopComponents[i]} />
 			{/each}
 		</div>
 		<div class="out-loops">
-			{#each outLoops as loop}
-				<Loop {...loop} />
+			{#each outLoops as loop, i}
+				<Loop {...loop} bind:this={outLoopComponents[i]} self={outLoopComponents[i]} />
 			{/each}
 		</div>
 		<div class="emblem-container">

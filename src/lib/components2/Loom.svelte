@@ -1,13 +1,13 @@
 <script>
-	import Knot from './Knot.svelte';
-	import Constant from '$lib/classes2/Constant.js';
-	import Add from '$lib/classes2/Add.js';
-	import Or from '$lib/classes2/Or.js';
-	import Multiply from '$lib/classes2/Multiply.js';
-	import Equivalent from '$lib/classes2/Equivalent.js';
-	import Display from '$lib/classes2/Display.js';
-	import { currentStrand } from '$lib/stores.js';
-	import StrandHelper from './StrandHelper.svelte';
+	// import Knot from './Knot.svelte';
+	// import Constant from '$lib/classes2/Constant.js';
+	// import Add from '$lib/classes2/Add.js';
+	// import Or from '$lib/classes2/Or.js';
+	// import Multiply from '$lib/classes2/Multiply.js';
+	// import Equivalent from '$lib/classes2/Equivalent.js';
+	// import Display from '$lib/classes2/Display.js';
+	// import { currentStrand } from '$lib/stores.js';
+	// import StrandHelper from './StrandHelper.svelte';
 
 	let offset = { x: 0, y: 0 };
 	let zoom = 1;
@@ -46,10 +46,11 @@
 	}
 
 	function tieStrand(loop1, loop2) {
+		console.log(loop1, loop2);
 		currentStrand.set([]);
 
 		// Prevent tie to self
-		if (loop1.knot === loop2.knot) return;
+		// if (loop1.knot === loop2.knot) return;
 
 		// Set bindings
 		loop1.binding = loop2;

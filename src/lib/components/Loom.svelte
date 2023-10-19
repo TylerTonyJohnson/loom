@@ -1,44 +1,128 @@
-<!-- Logic -->
 <script>
-	import Tapestry from '$lib/classes/Tapestry.js';
-	import Knot from '$lib/components/Knot.svelte';
+	import { writable } from 'svelte/store';
+	import { setContext } from 'svelte';
+	import { ThreadType } from '$lib/enums.js';
+	import Tray from './Tray.svelte';
+	import Knot from './Knot.svelte';
 	import Strand from './Strand.svelte';
-	import { onMount } from 'svelte';
 
-	// Parameters
-	let offset = { x: 0, y: 0 };
-	let zoom = 1;
+	// Stores
+	const offset = writable({ x: 0, y: 0 });
+	const zoom = writable(1);
+	const loopsToTie = writable([]);
+	const selected = writable([]);
+	const snapDistance = writable(20);
+
+	setContext('loom', { offset, zoom, loopsToTie, selected, snapDistance, updateKnot });
+
+	// Runtime
 	let isPanning = false;
+	let mousePosition = { x: 0, y: 0 };
 
-	// Setup
-	let tapestry;
-	if (!tapestry) tapestry = new Tapestry();
-
-	let strand;
-
-	onMount(() => {
-		offset.x = window.innerWidth / 4;
-		offset.y = window.innerHeight / 4;
+	// Loops to tie
+	loopsToTie.subscribe((capturedLoops) => {
+		switch (capturedLoops.length) {
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2:
+				tie(capturedLoops[0], capturedLoops[1]);
+				loopsToTie.set([]);
+				break;
+		}
 	});
+
+	// Knots
+	let knots = [];
 
 	/* 
         Functions
     */
 
+	function addKnot(knotPrototype, position = mousePosition) {
+		const newKnot = new knotPrototype(position);
+		knots.push(newKnot);
+		knots = knots;
+		return newKnot;
+	}
+
+	function deleteKnots() {
+		$selected.forEach((knot) => {
+			console.log('deleting ', knot);
+			knots.splice(knots.indexOf(knot), 1);
+			knots = knots;
+		});
+        $selected = [];
+	}
+
+	function tie(loopA, loopB) {
+		if (loopA.knot === loopB.knot) {
+			console.log('Loops are same - exiting');
+			return;
+		}
+		if (loopA.flowType === loopB.flowType) {
+			console.log('Loops are the same flow type - exiting');
+			return;
+		}
+
+		// if (loopA.threadType !== loopB.threadType) {
+		// 	console.log('Different thread types - exiting');
+		// 	return;
+		// }
+		switch (true) {
+			case loopA.threadType === loopB.threadType:
+				break;
+			case loopA.threadType === ThreadType.None && loopB.threadType !== ThreadType.None:
+				loopA.threadType = loopB.threadType;
+				console.log('changing A: ', loopA.threadType);
+				break;
+			case loopA.threadType !== ThreadType.None && loopB.threadType === ThreadType.None:
+				loopB.threadType = loopA.threadType;
+				console.log('changing B: ', loopB.threadType);
+				break;
+			case loopA.threadType !== loopB.threadType:
+				console.log('Loops have incompatible types');
+				return;
+		}
+
+		loopA.binding = loopB;
+		loopB.binding = loopA;
+		updateKnot(loopA.knot);
+		updateKnot(loopB.knot);
+	}
+
+	function updateKnot(knot) {
+		if (knots.includes(knot)) {
+			knots[knots.indexOf(knot)] = knots[knots.indexOf(knot)];
+		}
+	}
+
+	/* 
+        Events
+    */
+
+	// Mouse events
 	function handleMouseMove(event) {
+		mousePosition = { x: event.clientX, y: event.clientY };
 		if (!isPanning) return;
-		offset = { x: offset.x + event.movementX, y: offset.y + event.movementY };
+
+		offset.update((previousOffset) => {
+			return {
+				x: previousOffset.x + event.movementX,
+				y: previousOffset.y + event.movementY
+			};
+		});
 	}
 
 	function handleMouseDown(event) {
 		switch (event.which) {
 			case 1:
-				isPanning = true;
 				break;
 			case 2:
-				removeKnots();
 				break;
 			case 3:
+				isPanning = true;
 				break;
 		}
 	}
@@ -46,11 +130,11 @@
 	function handleMouseUp(event) {
 		switch (event.which) {
 			case 1:
-				isPanning = false;
 				break;
 			case 2:
 				break;
 			case 3:
+				isPanning = false;
 				break;
 		}
 	}
@@ -59,114 +143,70 @@
 		isPanning = false;
 	}
 
-	function save(event) {
-		console.log(tapestry);
-		localStorage.setItem('knots', JSON.stringify(tapestry.knots));
-	}
-
-	function load() {
-		const oldKnots = tapestry.knots;
-		tapestry.knots = JSON.parse(localStorage.getItem('knots'));
-		console.log(oldKnots[0].outLoops[0] === tapestry.knots[0].outLoops[0]);
+	// Key events
+	function handleKeyDown(event) {
+		const position = { x: mousePosition.x - offset.x, y: mousePosition.y - offset.y };
+		switch (event.code) {
+			case 'Delete':
+				deleteKnots();
+				break;
+		}
 	}
 
 	function handleWheel(event) {
-		zoom = Math.max(1, Math.min(10, zoom + event.deltaY * -0.01));
-	}
-
-	function removeKnots() {
-		tapestry.knots = [];
-		console.log('removed knots', tapestry.knots);
+		// zoom.update(oldZoom => {
+		//     return Math.max(1, Math.min(10, oldZoom + event.deltaY * -0.01));
+		// })
 	}
 </script>
 
-<!-- Structure -->
-
-<!-- 
-    BACKGROUND
- -->
+<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="background ease"
-	style="
-        background-image: url(Background.svg);
-        background-position: {offset.x}px {offset.y}px;
-        background-size: {zoom * 100}px;
-        "
-	class:grabbing={isPanning}
-	on:mousemove={handleMouseMove}
+	id="frame"
 	on:mousedown={handleMouseDown}
-/>
-
-<!-- Knots and Strands -->
-{#each tapestry.knots as knot}
-	<Knot {knot} {offset} {zoom} position={knot.position} />
-	{#each knot.outLoops as loop}
-		{#if loop.binding}
-			<Strand startPosition={loop.position} endPosition={loop.binding.position} {offset} {zoom} />
-		{/if}
+	on:mouseup={handleMouseUp}
+	on:contextmenu|preventDefault
+>
+	<!-- Background -->
+	<div
+		id="background"
+		style:background-image="url(Background.svg)"
+		style:background-position="{$offset.x}px {$offset.y}px"
+		style:background-size="{$zoom * 100}px"
+	/>
+	<!-- Knots -->
+	{#each knots as knot (knot)}
+		<Knot {knot} />
+		{#each knot.inLoops as loop (loop)}
+			{#if loop.binding && loop === loop.binding.binding}
+				<Strand startLoop={loop} endLoop={loop.binding} />
+			{/if}
+		{/each}
 	{/each}
-{/each}
+
+	<!-- Strand Helper -->
+	<!-- {#if $currentStrand.length > 0}
+		<StrandHelper position={mousePosition} />
+	{/if} -->
+
+	<Tray {addKnot} />
+</div>
 
 <!-- Utilities -->
-<svelte:window on:mouseleave={handleMouseLeave} on:mouseup={handleMouseUp} />
-<!-- <svelte:window on:wheel={handleWheel} /> -->
+<svelte:window on:mousemove={handleMouseMove} on:keydown={handleKeyDown} />
+<svelte:body on:mouseleave={handleMouseLeave} on:mouseup={handleMouseUp} on:wheel={handleWheel} />
 
-<h1 class="zoom-label">ZOOM: {zoom}</h1>
-<button class="toolbar" type="button" on:click={save}>Save</button>
-<button class="toolbar load" type="button" on:click={load}>Load</button>
-
-<h1
-	class="name ease"
-	style="
-    left: {offset.x}px; 
-    top: {offset.y}px;
-    scale: {zoom};
-"
->
-	LOOM
-</h1>
-
-<!-- Style -->
 <style>
-	.background {
-		position: absolute;
+	#frame {
+		position: fixed;
 		width: 100%;
 		height: 100%;
-		cursor: grab;
+		background-color: red;
 	}
 
-	.background.grabbing {
-		cursor: grabbing;
-	}
-
-	.name {
+	#background {
 		position: absolute;
-		translate: -50% -50%;
-		border: solid black 2px;
-		border-radius: 1em;
-		padding: 0.3em;
-		background-color: crimson;
-	}
-
-	.zoom-label {
-		position: fixed;
-		right: 0;
-		top: 0;
-	}
-
-	.toolbar {
-		position: fixed;
-		right: 0;
-		top: 3rem;
-	}
-
-	.toolbar.load {
-		top: 5rem;
-	}
-
-	.ease {
-		transition-property: background-size, scale;
-		transition-timing-function: ease-out;
-		transition-duration: 0.1s;
+		inset: 0px;
 	}
 </style>

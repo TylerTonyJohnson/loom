@@ -1,85 +1,36 @@
-import { checkType, getRandomWord, randomInt } from '../helpers';
-import { ThreadType } from '$lib/enums.js';
 import { FlowType } from '../enums';
-import Loop from './Loop';
+import Loop from '$lib/classes/Loop.js';
 import { writable } from 'svelte/store';
 
 export default class Knot {
-	constructor(position) {
-		this.position = writable({ x: 0, y: 0 });
-
+	constructor(name = '', emblem = '', position = { x: 0, y: 0 }) {
+		// Config
+		this.name = name;
+		this.emblem = emblem;
+        
+		// Data
+		this.position = new writable(position);
 		this.inLoops = [];
 		this.outLoops = [];
-
-		// Setup
-		this.setName();
-		this.setLoops();
-		this.setWeavePattern();
-
-		// this.position.subscribe((value) => {
-		// 	this.$position = value;
-		// });
-	}
-
-	updatePosition(position) {
-		this.position.update((oldPosition) => {
-			return { x: oldPosition.x + position.x, y: oldPosition.y + position.y };
-		});
-	}
-
-	setName() {
-		this.name = getRandomWord();
-		this.emblemName = 'd';
-	}
-
-	setLoops() {
-		const inputCount = randomInt(0, 4);
-		const outputCount = randomInt(0, 4);
-
-		for (let i = 0; i < inputCount; i++) {
-			this.addLoop(getRandomWord(), ThreadType.String, FlowType.Input);
-		}
-
-		for (let i = 0; i < outputCount; i++) {
-			this.addLoop(getRandomWord(), ThreadType.String, FlowType.Output);
-		}
-	}
-
-	setWeavePattern() {
-		this.weavePattern = () => {
-			console.log('weaving');
-		};
+        this.weave = () => {
+            console.log('executing');
+        }
 	}
 
 	/* 
         Methods
     */
 
-	weave() {
-		this.updateInputs();
-		this.weavePattern();
-	}
-
-	addLoop(name, type, flowType) {
-		const newLoop = new Loop(this, name, type, flowType);
-
+	addLoop(threadType, flowType, name = '', value = null) {
+		const loop = new Loop(this, threadType, flowType, name, value);
 		switch (flowType) {
 			case FlowType.Input:
-				this.inLoops.push(newLoop);
+				this.inLoops.push(loop);
 				break;
 			case FlowType.Output:
-				this.outLoops.push(newLoop);
+				this.outLoops.push(loop);
 				break;
 		}
-	}
-
-	/* 
-		Utilities
-	*/
-
-	updateInputs() {
-		this.inLoops.forEach((loop) => {
-			loop.sync();
-		});
+		return loop;
 	}
 }

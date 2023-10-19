@@ -1,24 +1,89 @@
 <script>
-	import Loop from './Loop.svelte';
+	import { getContext } from 'svelte';
+	import Loop from '$lib/components/Loop.svelte';
 
-	export let position;
 	export let knot;
-	export let offset;
-	export let zoom;
+
+	const { offset, zoom, loopsToTie, selected, snapDistance, updateKnot } = getContext('loom');
+
+	// Update position from knot data
+	let position;
+	knot.position.subscribe((knotPosition) => {
+		position = knotPosition;
+	});
+
+	let isSelected;
+	selected.subscribe((selectedArray) => {
+		isSelected = Array.from(selectedArray).includes(knot);
+	});
+
+	// Runtime
+	let width;
+	let height;
+	let isFocused = false;
 	let isMoving = false;
+	let outLoopFlows = [];
+	let inLoopFlows = [];
+
+	// Snapping
+
+	$: snapHeight = Math.ceil(height / $snapDistance) * $snapDistance;
+	$: snapWidth = Math.ceil(width / $snapDistance) * $snapDistance;
+
+	$: snapPosition = {
+		x: Math.ceil(position.x / $snapDistance) * $snapDistance,
+		y: Math.ceil(position.y / $snapDistance) * $snapDistance
+	};
+
+	/* 
+		Methods
+	*/
+
+	function execute() {
+		knot.weave();
+		updateKnot(knot);
+	}
+
+	function flowInLoops() {
+		inLoopFlows.forEach((flowFunction) => {
+			flowFunction();
+		});
+	}
+
+	function flowOutLoops() {
+		outLoopFlows.forEach((flowFunction) => {
+			flowFunction();
+		});
+	}
+
 	/* 
 		Events
 	*/
 	function handleMouseMove(event) {
 		if (!isMoving) return;
-		knot.updatePosition({x: event.movementX, y: event.movementY});
+		$selected.forEach((individualKnot) => {
+			individualKnot.position.update((oldPosition) => {
+				const x = oldPosition.x + event.movementX;
+				const y = oldPosition.y + event.movementY;
+				return { x: x, y: y };
+			});
+		});
+		// updateKnot(knot);
 	}
 
 	function handleMouseDown(event) {
 		switch (event.which) {
 			case 1:
 				isMoving = true;
-				event.target.focus();
+				if (isSelected) break;
+				switch (event.shiftKey) {
+					case false:
+						selected.set([knot]);
+						break;
+					case true:
+						selected.update((oldSelected) => [...oldSelected, knot]);
+						break;
+				}
 				break;
 			case 2:
 				break;
@@ -43,145 +108,171 @@
 		isMoving = false;
 	}
 
-	function handleSubmit() {
-		console.log('submit');
+	function handleClickFooter(event) {
+		flowInLoops();
+		execute();
+		flowOutLoops();
 	}
 
-	function handleWeave() {
-		knot.weave();
-		knot = knot;	// Not sure if this is the best way to do this
+	function handleKeyDown(event) {
+		// 	if (!isFocused) return;
+		// 	switch (event.code) {
+		// 		case 'Delete':
+		// 			break;
+		// 		case 'ArrowLeft':
+		// 			position.x += -snapDistance;
+		// 			break;
+		// 		case 'ArrowRight':
+		// 			position.x += snapDistance;
+		// 			break;
+		// 		case 'ArrowUp':
+		// 			position.y += -snapDistance;
+		// 			break;
+		// 		case 'ArrowDown':
+		// 			position.y += snapDistance;
+		// 			break;
+		// 	}
+	}
+
+	function handleFocus(event) {
+		isFocused = true;
+	}
+
+	function handleBlur(event) {
+		isFocused = false;
+	}
+
+	function handleMouseDownWindow() {
+		selected.set([]);
 	}
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
-	class="knot"
-	tabindex="0"
-	style="
-    scale: {zoom};
-    left: {$position.x}px;
-    top: {$position.y}px;
-    translate: {offset.x}px {offset.y}px;
-    "
+	id="frame"
+	style:scale={$zoom}
+	style:left="{snapPosition.x + $offset.x}px"
+	style:top="{snapPosition.y + $offset.y}px"
+	bind:clientWidth={width}
+	bind:clientHeight={height}
+	on:mousedown|stopPropagation={handleMouseDown}
+	on:focusin={handleFocus}
+	on:blur={handleBlur}
+	class:grabbing={isMoving}
+	class:selected={isSelected}
 >
-	<!-- Name -->
-	<div class="name" class:grabbing={isMoving} on:mousedown={handleMouseDown}>
-		{knot.name}
-	</div>
-
-	<!-- Loops -->
-	<div class="loop-container">
-		<!-- Inputs -->
-		<div class="input-container">
-			{#each knot.inLoops as loop}
-				<Loop {loop} editable={!loop.binding && knot.outLoops.length > 0} knotPosition={knot.position} {offset} />
+	<div id="header">{knot.name}</div>
+	<div id="body">
+		<div class="in-loops">
+			{#each knot.inLoops as loop, i}
+				<Loop {loop} bind:flow={inLoopFlows[i]} />
 			{/each}
 		</div>
-		<span class="material-symbols-outlined emblem-container">{knot.emblemName}</span>
-		<!-- Outputs -->
-		<div class="output-container">
-			{#each knot.outLoops as loop}
-				<Loop {loop} editable={knot.inLoops.length === 0} knotPosition={knot.position} {offset} />
+		<div class="out-loops">
+			{#each knot.outLoops as loop, i}
+				<Loop {loop} bind:flow={outLoopFlows[i]} />
 			{/each}
 		</div>
+		<div class="emblem-container">
+			<span class="emblem material-symbols-outlined">{knot.emblem}</span>
+		</div>
 	</div>
-
-	<!-- Bottom bumper -->
-	<div class="bumper" on:click={handleWeave}>
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div id="footer" on:click={handleClickFooter}>
 		<span class="material-symbols-outlined bumper-icon"> expand_more </span>
 	</div>
 </div>
 
+<!-- Utilities -->
 <svelte:window
-	on:mouseleave={handleMouseLeave}
-	on:mouseup={handleMouseUp}
 	on:mousemove={handleMouseMove}
+	on:mousedown={handleMouseDownWindow}
+	on:mouseup={handleMouseUp}
+	on:keydown={handleKeyDown}
 />
 
+<svelte:body on:mouseleave={handleMouseLeave} />
+
 <style>
-	.knot {
+	#frame {
 		position: absolute;
 		display: flex;
 		flex-direction: column;
+
 		min-width: 8rem;
-		max-width: 16rem;
-		translate: -50% -50%;
-		transition-property: scale;
-		transition-timing-function: ease-out;
-		transition-duration: 0.1s;
-		/* border: solid white 2px; */
+		/* max-width: 16rem; */
+
 		border-radius: 1rem;
 		overflow: hidden;
+		cursor: grab;
+
+		color: white;
 		background-color: rgba(221, 160, 221, 0.05);
 		backdrop-filter: blur(3px) grayscale(50%);
-		box-shadow: rgb(247, 168, 247) inset 2px 2px 8px, 
-			rgb(74, 49, 74) inset -2px -2px 8px,
+		box-shadow: rgb(247, 168, 247) inset 2px 2px 8px, rgb(74, 49, 74) inset -2px -2px 8px,
 			rgba(0, 0, 0, 0.5) 4px 4px 8px;
 	}
 
-	.knot:focus-within {
-		/* border-color: orange;
-		border-width: 3px; */
-		outline: orange 3px solid;
-	}
-
-	.name {
-		min-height: 1rem;
-		background-color: rgba(0, 128, 0, 0.8);
+	#header {
+		width: 100%;
+		height: 40px;
 		padding: 0.3rem;
 
-		color: white;
 		font-size: 1.5rem;
 		text-align: center;
-		cursor: grab;
-		border-radius: 1rem 1rem 0 0 ;
-	}
-	.name.grabbing {
-		cursor: grabbing;
+
+		background-color: green;
+		opacity: 0.8;
+		border-radius: 1rem 1rem 0 0;
 	}
 
-	.shadow {
-		box-shadow: rgba(255, 255, 255, 0.5) inset 2px 2px 4px, 
-			rgba(0, 0, 0, 0.5) inset -2px -2px 4px;
-	}
-
-	.loop-container {
+	#body {
 		display: grid;
 		grid-template-columns: auto auto auto;
+		grid-template-areas: 'in-loops emblem out-loops';
 		justify-content: space-between;
 		padding: 0.25rem;
-		/* background-color: red; */
+		flex-grow: 1;
+		/* box-shadow: inset red 0 0 10px; */
 	}
 
-	.input-container,
-	.output-container {
+	.in-loops {
 		display: flex;
 		flex-direction: column;
-		gap: 0.25rem;
+		grid-area: in-loops;
+		/* background-color: orange; */
+	}
+
+	.out-loops {
+		display: flex;
+		flex-direction: column;
+		grid-area: out-loops;
+		/* background-color: teal; */
 	}
 
 	.emblem-container {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		/* background-color: red; */
-		color: white;
-		width: 2rem;
+		grid-area: emblem;
 	}
 
-	.bumper {
+	#footer {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		height: 20px;
 		width: 100%;
-		height: 1rem;
-		background-color: rgba(0, 128, 0, 0.8);
-		border-radius: 0 0 1rem 1rem;
+		cursor: pointer;
+		margin-bottom: 0px;
+
+		background-color: green;
+		opacity: 0.8;
 	}
 
-	.bumper-icon {
-		color: white;
-		font-size: 0.75rem;
+	.selected {
+		outline: orange 3px solid;
 	}
 </style>

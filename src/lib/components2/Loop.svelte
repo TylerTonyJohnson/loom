@@ -3,11 +3,13 @@
 	import { currentStrand } from '$lib/stores.js';
 
 	// export let loop;
+	// export let knot;
 	export let threadType;
 	export let flowType;
 	export let name;
 
 	// Runtime
+	export let self;
 	export let value;
 	export let binding;
 
@@ -16,6 +18,10 @@
 		// if (!strand.includes(loop)) return;
 		// loop = loop;
 	});
+
+	export function conch() {
+		console.log('conch');
+	}
 
 	/* 
 		Events
@@ -28,13 +34,13 @@
 	function handleMouseDownEyelet(event) {
 		console.log('start strand')
 		if ($currentStrand.length !== 0) return;
-		currentStrand.set([this]);
+		currentStrand.set([self]);
 	}
 
 	function handleMouseUpEyelet(event) {
 		console.log('end strand');
 		if ($currentStrand.length !== 1) return;
-		currentStrand.update((strand) => [...strand, loop]);
+		currentStrand.update((strand) => [...strand, self]);
 	}
 
 	function handleMouseUpWindow(event) {
@@ -114,6 +120,7 @@
 </div>
 
 <svelte:window on:mouseup={handleMouseUpWindow} />
+<svelte:options accessors />
 
 <style>
 	/* Structure */

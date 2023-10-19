@@ -1,58 +1,76 @@
 <script>
-	export let offset;
-	export let zoom;
-	export let startPosition;
-	export let endPosition;
+	import { getContext } from 'svelte';
 
-	const radius = 6;
-	const circlePadding = 6;
-	// const linePadding = 20;
+	// Imports
+	export let startLoop;
+	export let endLoop;
 
-	$: position = {
-		x: Math.min($startPosition.x, $endPosition.x) - circlePadding,
-		y: Math.min($startPosition.y, $endPosition.y) - circlePadding
+	// Context
+	const { offset, zoom, loopsToTie, snapDistance, updateKnot } = getContext('loom');
+
+	// Position
+	const boundary = 6;
+	let startPosition = { x: 10, y: 10 };
+	startLoop.position.subscribe((value) => {
+		startPosition = { x: value.x, y: value.y };
+	});
+	let endPosition = { x: 100, y: 100 };
+	endLoop.position.subscribe((value) => {
+		endPosition = { x: value.x, y: value.y };
+	});
+
+	// Translate position into svg
+	$: totalLocation = {
+		x: Math.min(startPosition.x, endPosition.x) - boundary,
+		y: Math.min(startPosition.y, endPosition.y) - boundary
 	};
-	$: size = {
-		x: Math.abs($endPosition.x - $startPosition.x) + 2 * circlePadding,
-		y: Math.abs($endPosition.y - $startPosition.y) + 2 * circlePadding
+
+	$: totalSize = {
+		x: Math.abs(endPosition.x - startPosition.x) + 2 * boundary,
+		y: Math.abs(endPosition.y - startPosition.y) + 2 * boundary
 	};
+
+	let color;
+	$: {
+		switch (true) {
+			case startLoop.value === null && endLoop.value === null:
+				color = 'white';
+				break;
+			case startLoop.value === endLoop.value:
+				color = 'red';
+				break;
+			case startLoop.value !== endLoop.value:
+				color = 'yellow';
+				break;
+		}
+	}
 </script>
 
-<div
-	class="strand"
-	style="
-        scale: {zoom};
-        left: {position.x}px;
-        top: {position.y}px;
-        width: {size.x}px;
-        height: {size.y}px;
-        translate: {offset.x}px {offset.y}px;
-    "
+<svg
+	id="frame"
+	style:left="{totalLocation.x + $offset.x}px"
+	style:top="{totalLocation.y + $offset.y}px"
+	style:width="{totalSize.x}px"
+	style:height="{totalSize.y}px"
+	xmlns="http://www.w3.org/2000/svg"
 >
-	<svg
-		width="100%"
-		height="100%"
-		fill="none"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<line
-			x1={$startPosition.x - position.x}
-			y1={$startPosition.y - position.y}
-			x2={$endPosition.x - position.x}
-			y2={$endPosition.y - position.y}
-			stroke="red"
-			stroke-width="4"
-		/>
-        <circle cx={$startPosition.x - position.x} cy={$startPosition.y - position.y} r={radius} fill='white' />
-        <circle cx={$endPosition.x - position.x} cy={$endPosition.y - position.y} r={radius} fill='white' />
-	</svg>
-</div>
+	<line
+		x1="{startPosition.x < endPosition.x ? 0 + boundary : totalSize.x - boundary}px"
+		y1="{startPosition.y < endPosition.y ? 0 + boundary : totalSize.y - boundary}px"
+		x2="{startPosition.x < endPosition.x ? totalSize.x - boundary : 0 + boundary}px"
+		y2="{startPosition.y < endPosition.y ? totalSize.y - boundary : 0 + boundary}px"
+		style:stroke={color}
+		stroke-width="4"
+	/>
+</svg>
 
 <style>
-	.strand {
+	#frame {
 		position: absolute;
-		/* border: lightcyan 2px solid; */
+		/* width: 200px;
+		height: 200px; */
+		/* border: solid orange 3px; */
 		pointer-events: none;
-        z-index: 2;
+		z-index: 2;
 	}
 </style>
